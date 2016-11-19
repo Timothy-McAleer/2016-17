@@ -1,0 +1,66 @@
+import cv2
+import numpy as np
+
+drawing = False
+mode = True
+ix, iy = -1,-1
+
+def nothing(x):
+    pass
+
+def drawCircle(event, x, y, flags, param):
+    global ix,iy,drawing,mode
+
+    if event == cv2.EVENT_LBUTTONDOWN:
+        drawing = True
+        ix,iy = x,y
+
+    elif event == cv2.EVENT_MOUSEMOVE:
+        if drawing == True:
+            if mode == True:
+                cv2.rectangle(img,(ix,iy),(x,y),(80,255,235),-1)
+            else:
+                cv2.circle(img,(x,y),5,(0,0,255),-1)
+
+    elif event == cv2.EVENT_LBUTTONUP:
+        drawing = False
+        if mode == True:
+            cv2.rectangle(img,(ix,iy),(x,y),(0,255,0),-1)
+        else:
+            cv2.circle(img,(x,y),5,(0,0,255),-1)
+
+img = np.zeros((750,750,3),np.uint8)
+cv2.namedWindow('otherImage')
+
+cv2.createTrackbar('R', 'otherImage',0,255,nothing)
+cv2.createTrackbar('G', 'otherImage',0,255,nothing)
+cv2.createTrackbar('B', 'otherImage',0,255,nothing)
+cv2.createTrackbar('Size', 'otherImage', 0, 30, nothing)
+
+switch = '0 : OFF \n1 : ON'
+cv2.createTrackbar(switch, 'otherImage',0,1,nothing)
+
+while(1):
+
+    cv2.imshow('otherImage', img)
+
+    r = cv2.getTrackbarPos('R', 'otherImage')
+    g = cv2.getTrackbarPos('G', 'otherImage')
+    b = cv2.getTrackbarPos('B', 'otherImage')
+    s = cv2.getTrackbarPos(switch, 'otherImage')
+    size = cv2.getTrackbarPos('size', 'otherImage')
+
+    if s == 0:
+        img[:] = 0
+    else:
+        img[:] = [b,g,r]
+
+    #while(cv2.EVENT_MOUSEMOVE):
+    k = cv2.waitKey(1) & 0xFF
+    if k == ord('m'):
+        mode = not mode
+    elif k == 27:
+        break
+
+
+cv2.destroyAllWindows()
